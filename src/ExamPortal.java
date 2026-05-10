@@ -822,7 +822,7 @@ public class ExamPortal extends JFrame {
 
     /**
      * Shows detailed feedback after quiz completion
-     * Displays score and correct answers for each question
+     * it will display score and correct answers for each question
      */
     void showFeedback() {
         JTextArea fa = new JTextArea(15, 45);
