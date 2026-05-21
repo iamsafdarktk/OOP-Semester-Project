@@ -404,7 +404,17 @@ public class ExamPortal extends JFrame {
     void createQuiz(JTextArea area) {
         try {
             Connection con = DB.getConnection();
-            String subject = JOptionPane.showInputDialog("Enter Subject (must match bank exactly):");
+            String[] subjects = { "OOPs", "English","DBMS","Applied Physics" };
+
+            String subject = (String) JOptionPane.showInputDialog(
+                    this,
+                    "Select Subject:",
+                    "Choose Subject",
+                    JOptionPane.QUESTION_MESSAGE,
+                    null,
+                    subjects,
+                    subjects[0]
+            );
             String title = JOptionPane.showInputDialog("Quiz Title:");
             String password = String.format("%04d", new Random().nextInt(10000));
             int n = Integer.parseInt(JOptionPane.showInputDialog("Number of Questions:"));
@@ -425,6 +435,39 @@ public class ExamPortal extends JFrame {
             quizId = rs.getInt(1);
 
             PreparedStatement ps2 = con.prepareStatement("SELECT * FROM question_bank WHERE subject=? ORDER BY RAND() LIMIT ?");
+            PreparedStatement countPs = con.prepareStatement(
+                    "SELECT COUNT(*) FROM question_bank WHERE subject=?"
+            );
+
+            countPs.setString(1, subject);
+
+            ResultSet countRs = countPs.executeQuery();
+
+            if(countRs.next()) {
+
+                int available = countRs.getInt(1);
+
+                if(available == 0) {
+
+                    JOptionPane.showMessageDialog(
+                            this,
+                            "No questions found for subject: " + subject
+                    );
+
+                    return;
+                }
+
+                if(n > available) {
+
+                    JOptionPane.showMessageDialog(
+                            this,
+                            "Only " + available +
+                                    " questions available for " + subject
+                    );
+
+                    return;
+                }
+            }
             ps2.setString(1, subject); ps2.setInt(2, n);
             ResultSet rq = ps2.executeQuery();
 
